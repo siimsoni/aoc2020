@@ -6,35 +6,34 @@ pub fn parse<R>(mut reader: R) -> Vec<Declaration>
 where
     R: BufRead,
 {
-    let mut buf: Vec<u8> = Vec::new();
-    let mut result = Vec::new();
+    let mut result: Vec<Declaration> = Vec::new();
+    let mut in_buf: [u8; 4096] = [0; 4096];
     let mut group = 0;
-    while let Ok(n) = reader.read_until(b'\n', &mut buf) {
-        match n {
-            0 => break,
-            1 => {
-                if buf == b"\n" {
+    let mut answers = 0;
+    while let Ok(in_len) = reader.read(&mut in_buf) {
+        if in_len == 0 {
+            break;
+        }
+        if (result.capacity() - result.len()) < (in_len / 8) {
+            result.reserve(in_len / 8);
+        }
+        for c in in_buf[..in_len].iter() {
+            if c == &b'\n' {
+                if answers == 0 {
                     group += 1;
                 } else {
-                    result.push(Declaration {
-                        group,
-                        answers: 1 << (buf[0] - b'a'),
-                    });
+                    result.push(Declaration { group, answers });
+                    answers = 0;
                 }
-            }
-            _ => {
-                if buf[buf.len() - 1] == b'\n' {
-                    buf.pop();
-                }
-                let mut answers = 0;
-                for c in &buf {
-                    answers |= 1 << (c - b'a');
-                }
-                result.push(Declaration { group, answers });
+            } else {
+                answers |= 1 << (c - b'a');
             }
         }
-        buf.clear();
     }
+    if answers != 0 {
+        result.push(Declaration { group, answers });
+    }
+
     result
 }
 
