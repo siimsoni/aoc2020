@@ -63,6 +63,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "btoi"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97c0869a9faa81f8bbf8102371105d6d0a7b79167a04c340b04ab16892246a11"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -308,6 +317,14 @@ dependencies = [
 name = "d08"
 version = "0.1.0"
 dependencies = [
+ "criterion",
+]
+
+[[package]]
+name = "d09"
+version = "0.1.0"
+dependencies = [
+ "btoi",
  "criterion",
 ]
 

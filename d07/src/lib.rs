@@ -81,7 +81,12 @@ pub fn p1_solve(ruleset: &[BagCountRuleStatement]) -> usize {
             parents.push(color);
         }
     }
-    count_parents(&Ustr::from("shiny gold"), &child_2_parent, UstrSet::default()).len()
+    count_parents(
+        &Ustr::from("shiny gold"),
+        &child_2_parent,
+        UstrSet::default(),
+    )
+    .len()
 }
 
 fn count_parents(color: &Ustr, child_2_parent: &UstrMap<Vec<&Ustr>>, set: UstrSet) -> UstrSet {
