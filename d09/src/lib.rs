@@ -43,14 +43,10 @@ where
 
 pub fn p1_solve(input: &[u64], preamble_len: usize) -> Option<u64> {
     let mut preamble = VecDeque::with_capacity(preamble_len);
-    let mut iter = &mut input.iter();
-    for (i, val) in &mut iter.enumerate() {
+    for val in input[..preamble_len].iter() {
         preamble.push_back(*val);
-        if i == preamble_len - 1 {
-            break;
-        }
     }
-    for val in &mut iter {
+    for val in input[preamble_len..].iter() {
         let mut valid = false;
         let contiguous = preamble.make_contiguous();
         let preamble_contiguous = contiguous.iter().enumerate();
