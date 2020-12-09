@@ -47,18 +47,12 @@ pub fn p1_solve(input: &[u64], preamble_len: usize) -> Option<u64> {
         preamble.push_back(*val);
     }
     for val in input[preamble_len..].iter() {
-        let mut valid = false;
         let contiguous = preamble.make_contiguous();
-        let preamble_contiguous = contiguous.iter().enumerate();
-        'validate: for (i, a) in preamble_contiguous {
-            for b in contiguous[i + 1..].iter() {
-                if &(a + b) == val {
-                    valid = true;
-                    break 'validate;
-                }
-            }
-        }
-        if !valid {
+        if !contiguous
+            .iter()
+            .enumerate()
+            .any(|(i, a)| contiguous[i + 1..].iter().any(|b| &(a + b) == val))
+        {
             return Some(*val);
         }
         // one might think it's faster to clear space first, and then push,
