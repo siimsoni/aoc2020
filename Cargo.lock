@@ -344,6 +344,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "d12"
+version = "0.1.0"
+dependencies = [
+ "btoi",
+ "criterion",
+]
+
+[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
