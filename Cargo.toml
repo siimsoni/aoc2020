@@ -13,6 +13,7 @@ members = [
     'd11',
     'd12',
     'd13',
+    'd14',
 ]
 
 [profile.release]
