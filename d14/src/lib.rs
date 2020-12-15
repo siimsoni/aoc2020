@@ -1,10 +1,11 @@
 extern crate btoi;
 #[macro_use]
 extern crate nom;
+extern crate rustc_hash;
 
 use btoi::btoi;
 use nom::character::{is_alphanumeric, is_digit};
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 use std::fmt;
 use std::io::BufRead;
 #[derive(Debug)]
@@ -185,7 +186,7 @@ where
 }
 
 pub fn p1_solve(instructions: &[Instruction]) -> Option<u64> {
-    let mut values = HashMap::new();
+    let mut values = FxHashMap::default();
     let mut active_bitmask = None;
     for inst in instructions {
         match inst {
@@ -208,7 +209,7 @@ pub fn p1_solve(instructions: &[Instruction]) -> Option<u64> {
 }
 
 pub fn p2_solve(instructions: &[Instruction]) -> Option<u64> {
-    let mut values = HashMap::new();
+    let mut values = FxHashMap::default();
     values.reserve(instructions.len());
     let mut active_bitmask = None;
     for inst in instructions {

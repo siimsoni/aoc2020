@@ -366,6 +366,7 @@ dependencies = [
  "btoi",
  "criterion",
  "nom",
+ "rustc-hash",
 ]
 
 [[package]]
