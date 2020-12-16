@@ -4,7 +4,7 @@ extern crate nom;
 
 use btoi::btoi;
 use nom::character::{is_alphabetic, is_digit, is_space};
-use std::collections::{HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::hash::{Hash, Hasher};
 use std::io::BufRead;
 use std::str::from_utf8;
@@ -214,7 +214,7 @@ impl Parser {
                     }
                 }
             }
-            ParserState::Done => {},
+            ParserState::Done => {}
         }
     }
 }
@@ -268,13 +268,15 @@ pub fn p2_solve(
         })
         .collect();
 
-    let mut remaining_rules = HashSet::new();
+    let mut remaining_rules = FxHashSet::default();
+    remaining_rules.reserve(rules.len());
     for rule in rules.iter() {
         remaining_rules.insert(rule);
     }
 
     // step 2: skip values that match _every_ rule
-    let mut values_by_field = HashMap::new();
+    let mut values_by_field = FxHashMap::default();
+    values_by_field.reserve(my_ticket.values.len());
     for ticket in valid_tickets.iter() {
         for (field, value) in ticket.values.iter().enumerate() {
             let mut always_valid = true;
@@ -285,18 +287,22 @@ pub fn p2_solve(
                 }
             }
             if !always_valid {
-                let field_values = values_by_field.entry(field).or_insert_with(HashSet::new);
+                let field_values = values_by_field
+                    .entry(field)
+                    .or_insert_with(FxHashSet::default);
                 field_values.insert(value);
             }
         }
     }
 
-    let mut mappings = HashMap::new();
+    let mut mappings = FxHashMap::default();
 
     loop {
-        let mut invalid_per_field_per_rule = HashMap::new();
+        let mut invalid_per_field_per_rule = FxHashMap::default();
+        invalid_per_field_per_rule.reserve(values_by_field.len());
         for (field, values) in values_by_field.iter() {
-            let mut invalid_per_rule = HashMap::new();
+            let mut invalid_per_rule = FxHashMap::default();
+            invalid_per_rule.reserve(remaining_rules.len());
             for rule in remaining_rules.iter() {
                 let count =
                     values.iter().fold(
