@@ -240,25 +240,26 @@ where
 }
 
 pub fn p1_solve((rules, _, nearby_tickets): &(Box<[Rule]>, Ticket, Box<[Ticket]>)) -> Option<u64> {
-    let mut invalid_sum: u64 = 0;
-    for ticket in nearby_tickets.iter() {
-        invalid_sum += ticket.values.iter().fold(0, |acc, value| {
-            if rules.iter().any(|rule| rule.is_valid(value)) {
-                acc
-            } else {
-                acc + *value as u64
-            }
-        });
-    }
-
-    Some(invalid_sum)
+    Some(
+        nearby_tickets
+            .iter()
+            .map(|ticket| {
+                ticket
+                    .values
+                    .iter()
+                    .filter(|value| !rules.iter().any(|rule| rule.is_valid(value)))
+                    .map(|value| *value as u64)
+                    .sum::<u64>()
+            })
+            .sum(),
+    )
 }
 
 pub fn p2_solve(
     (rules, my_ticket, nearby_tickets): &(Box<[Rule]>, Ticket, Box<[Ticket]>),
 ) -> Option<u64> {
-    // step 1: remove obviously invalid tickets
-    let valid_tickets: Vec<&Ticket> = nearby_tickets
+    let mut values_by_field = FxHashMap::default();
+    for (field, value) in nearby_tickets
         .iter()
         .filter(|ticket| {
             ticket
@@ -266,71 +267,49 @@ pub fn p2_solve(
                 .iter()
                 .all(|value| rules.iter().any(|rule| rule.is_valid(value)))
         })
-        .collect();
-
-    let mut remaining_rules = FxHashSet::default();
-    remaining_rules.reserve(rules.len());
-    for rule in rules.iter() {
-        remaining_rules.insert(rule);
+        .flat_map(|ticket| {
+            ticket.values.iter().enumerate().filter(|(_, value)| {
+                let rules_matched = rules.iter().filter(|rule| rule.is_valid(value)).count();
+                rules_matched > 0 && rules_matched < rules.len()
+            })
+        })
+    {
+        let values = values_by_field
+            .entry(field)
+            .or_insert_with(FxHashSet::default);
+        values.insert(value);
     }
 
-    // step 2: skip values that match _every_ rule
-    let mut values_by_field = FxHashMap::default();
-    values_by_field.reserve(my_ticket.values.len());
-    for ticket in valid_tickets.iter() {
-        for (field, value) in ticket.values.iter().enumerate() {
-            let mut always_valid = true;
-            for rule in remaining_rules.iter() {
-                if !rule.is_valid(value) {
-                    always_valid = false;
-                    break;
-                }
-            }
-            if !always_valid {
-                let field_values = values_by_field
-                    .entry(field)
-                    .or_insert_with(FxHashSet::default);
-                field_values.insert(value);
-            }
-        }
-    }
-
+    let mut remaining_rules: FxHashSet<&Rule> = rules.iter().collect();
     let mut mappings = FxHashMap::default();
 
     loop {
-        let mut invalid_per_field_per_rule = FxHashMap::default();
-        invalid_per_field_per_rule.reserve(values_by_field.len());
-        for (field, values) in values_by_field.iter() {
-            let mut invalid_per_rule = FxHashMap::default();
-            invalid_per_rule.reserve(remaining_rules.len());
-            for rule in remaining_rules.iter() {
-                let count =
-                    values.iter().fold(
-                        0,
-                        |acc, value| if !rule.is_valid(value) { acc + 1 } else { acc },
-                    );
-                invalid_per_rule.insert(*rule, count);
-            }
-            invalid_per_field_per_rule.insert(*field, invalid_per_rule);
-        }
-
         let mut changes = 0;
-
-        for (field, invalid_per_rule) in invalid_per_field_per_rule.iter() {
+        for (field, values) in values_by_field.iter() {
+            let invalid_per_rule: FxHashMap<&Rule, usize> = remaining_rules
+                .iter()
+                .map(|rule| {
+                    (
+                        *rule,
+                        values.iter().filter(|value| !rule.is_valid(value)).count(),
+                    )
+                })
+                .collect::<FxHashMap<&Rule, usize>>();
             let sum: usize = invalid_per_rule.iter().map(|(_, v)| v).sum();
             if (invalid_per_rule.len() - sum) == 1 {
                 for (rule, count) in invalid_per_rule {
-                    if count == &0 {
-                        mappings.insert(*rule, *field);
-                        remaining_rules.remove(*rule);
-                        values_by_field.remove(field);
+                    if count == 0 {
+                        mappings.insert(rule, *field);
                         changes += 1;
                         break;
                     }
                 }
             }
         }
-
+        for (rule, field) in mappings.iter() {
+            remaining_rules.remove(rule);
+            values_by_field.remove(&field);
+        }
         if changes == 0 {
             break;
         }
