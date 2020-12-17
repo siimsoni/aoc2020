@@ -1,6 +1,7 @@
-use std::collections::{HashMap, HashSet};
+extern crate rustc_hash;
 use std::fmt;
 use std::io::BufRead;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 #[derive(Eq, Hash, PartialEq)]
 pub struct Coordinate<T> {
@@ -159,7 +160,7 @@ where
 }
 
 pub fn p1_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
-    let mut active = HashSet::new();
+    let mut active = FxHashSet::default();
     let mut x = 0;
     let mut y = 0;
     let z = 1;
@@ -174,7 +175,7 @@ pub fn p1_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
         }
     }
     for _ in 0..6 {
-        let mut neighbors = HashMap::new();
+        let mut neighbors = FxHashMap::default();
         for coordinate in active.iter() {
             for neighbor in coordinate.neighbors() {
                 *neighbors.entry(neighbor).or_insert(0) += 1;
@@ -201,7 +202,7 @@ pub fn p1_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
 }
 
 pub fn p2_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
-    let mut active = HashSet::new();
+    let mut active = FxHashSet::default();
     let mut a = 0;
     let mut b = 0;
     let c = 1;
@@ -217,7 +218,7 @@ pub fn p2_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
         }
     }
     for _ in 0..6 {
-        let mut neighbors = HashMap::new();
+        let mut neighbors = FxHashMap::default();
         for coordinate in active.iter() {
             for neighbor in coordinate.neighbors() {
                 *neighbors.entry(neighbor).or_insert(0) += 1;

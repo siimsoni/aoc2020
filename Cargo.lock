@@ -393,6 +393,7 @@ name = "d17"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "rustc-hash",
 ]
 
 [[package]]
