@@ -174,8 +174,10 @@ pub fn p1_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
             y += 1;
         }
     }
+    let mut neighbors = FxHashMap::default();
     for _ in 0..6 {
-        let mut neighbors = FxHashMap::default();
+        neighbors.clear();
+        neighbors.reserve(active.len() * 26);
         for coordinate in active.iter() {
             for neighbor in coordinate.neighbors() {
                 *neighbors.entry(neighbor).or_insert(0) += 1;
@@ -217,8 +219,10 @@ pub fn p2_solve((result, width): &(Box<[bool]>, usize)) -> Option<usize> {
             b += 1;
         }
     }
+    let mut neighbors = FxHashMap::default();
     for _ in 0..6 {
-        let mut neighbors = FxHashMap::default();
+        neighbors.clear();
+        neighbors.reserve(active.len() * 80);
         for coordinate in active.iter() {
             for neighbor in coordinate.neighbors() {
                 *neighbors.entry(neighbor).or_insert(0) += 1;
