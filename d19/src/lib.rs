@@ -1,7 +1,7 @@
 extern crate btoi;
-
+extern crate rustc_hash;
 use btoi::btoi;
-use std::collections::{HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::io::BufRead;
 
 #[derive(Debug)]
@@ -274,7 +274,7 @@ where
     )
 }
 
-fn p1_validate(message: &[u8], rule_map: &HashMap<usize, &RuleKind>, rule: &RuleKind) -> usize {
+fn p1_validate(message: &[u8], rule_map: &FxHashMap<usize, &RuleKind>, rule: &RuleKind) -> usize {
     match rule {
         RuleKind::Concrete(value) => {
             if !message.is_empty() && message[0] == *value {
@@ -335,7 +335,7 @@ fn p1_validate(message: &[u8], rule_map: &HashMap<usize, &RuleKind>, rule: &Rule
 }
 
 pub fn p1_solve((rule_defs, messages): &ParseResult) -> Option<usize> {
-    let mut map = HashMap::new();
+    let mut map = FxHashMap::default();
     for rule_def in rule_defs.iter() {
         map.insert(rule_def.id, &rule_def.rule);
     }
@@ -349,19 +349,19 @@ pub fn p1_solve((rule_defs, messages): &ParseResult) -> Option<usize> {
 
 fn p2_validate(
     message: &[u8],
-    rule_map: &HashMap<usize, &RuleKind>,
+    rule_map: &FxHashMap<usize, &RuleKind>,
     rule: &RuleKind,
-) -> HashSet<usize> {
+) -> FxHashSet<usize> {
     match rule {
         RuleKind::Concrete(value) => {
-            let mut result = HashSet::new();
+            let mut result = FxHashSet::default();
             if !message.is_empty() && message[0] == *value {
                 result.insert(1);
             }
             result
         }
         RuleKind::Unary(UnaryRuleSequence { rules }) => {
-            let mut pos: HashSet<usize> = HashSet::new();
+            let mut pos: FxHashSet<usize> = FxHashSet::default();
             pos.insert(0);
             for rule in rules.iter() {
                 pos = pos
@@ -371,15 +371,15 @@ fn p2_validate(
                         p2_validate(&message[p..], rule_map, &rule_map[&rule])
                             .iter()
                             .map(move |v| v + p)
-                            .collect::<HashSet<usize>>()
+                            .collect::<FxHashSet<usize>>()
                     })
                     .collect();
             }
             pos
         }
         RuleKind::Binary(BinaryRuleSequence { left, right }) => {
-            let mut result = HashSet::new();
-            let mut pos_left: HashSet<usize> = HashSet::new();
+            let mut result = FxHashSet::default();
+            let mut pos_left: FxHashSet<usize> = FxHashSet::default();
             pos_left.insert(0);
             for rule in left.iter() {
                 pos_left = pos_left
@@ -389,14 +389,14 @@ fn p2_validate(
                         p2_validate(&message[p..], rule_map, &rule_map[&rule])
                             .iter()
                             .map(move |v| v + p)
-                            .collect::<HashSet<usize>>()
+                            .collect::<FxHashSet<usize>>()
                     })
                     .collect();
             }
 
             result.extend(pos_left);
 
-            let mut pos_right: HashSet<usize> = HashSet::new();
+            let mut pos_right: FxHashSet<usize> = FxHashSet::default();
             pos_right.insert(0);
             for rule in right.iter() {
                 pos_right = pos_right
@@ -406,7 +406,7 @@ fn p2_validate(
                         p2_validate(&message[p..], rule_map, &rule_map[&rule])
                             .iter()
                             .map(move |v| v + p)
-                            .collect::<HashSet<usize>>()
+                            .collect::<FxHashSet<usize>>()
                     })
                     .collect();
             }
@@ -417,7 +417,7 @@ fn p2_validate(
 }
 
 pub fn p2_solve((rule_defs, messages): &ParseResult) -> Option<usize> {
-    let mut map = HashMap::new();
+    let mut map = FxHashMap::default();
 
     let swap_8 = RuleKind::Binary(BinaryRuleSequence {
         left: Box::from([42]),
