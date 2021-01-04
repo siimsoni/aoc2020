@@ -8,16 +8,23 @@ fn main() {
 
     let part = args
         .get(1)
-        .expect("Missing argument 'part'")
+        .expect("required [part]")
         .trim()
         .parse()
-        .expect("Expected number value for expected_value");
+        .expect("invalid [part]");
+
+    let expected_value = args
+        .get(2)
+        .expect("required [value]")
+        .trim()
+        .parse()
+        .expect("invalid [value]");
 
     let parsed = parse(stdin().lock());
 
     let result = match part {
-        1 => p1_solve(&parsed),
-        2 => p2_solve(&parsed),
+        1 => p1_solve(&parsed, expected_value),
+        2 => p2_solve(&parsed, expected_value),
         _ => {
             println!("Invalid part: {}", part);
             None

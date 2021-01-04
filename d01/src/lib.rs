@@ -1,8 +1,6 @@
 use std::io::BufRead;
 use btoi::btoi;
 
-const EXPECTED_VALUE: i32 = 2020;
-
 pub fn parse<R>(mut reader: R) -> Vec<i32>
 where
     R: BufRead,
@@ -31,15 +29,15 @@ where
     result
 }
 
-pub fn p1_solve(a: &[i32]) -> Option<i32> {
-    let mut map: Vec<bool> = Vec::with_capacity(EXPECTED_VALUE as usize);
-    map.resize(EXPECTED_VALUE as usize, false);
+pub fn p1_solve(a: &[i32], expected_value: usize) -> Option<i32> {
+    let mut map: Vec<bool> = Vec::with_capacity(expected_value);
+    map.resize(expected_value, false);
     for value in a {
         map[*value as usize] = true;
     }
     let mut diff;
     for value in a {
-        diff = EXPECTED_VALUE - value;
+        diff = expected_value as i32 - value;
         if map[diff as usize] {
             return Some(value * diff);
         }
@@ -47,9 +45,9 @@ pub fn p1_solve(a: &[i32]) -> Option<i32> {
     None
 }
 
-pub fn p2_solve(a: &[i32]) -> Option<i32> {
-    let mut map: Vec<bool> = Vec::with_capacity(EXPECTED_VALUE as usize);
-    map.resize(EXPECTED_VALUE as usize, false);
+pub fn p2_solve(a: &[i32], expected_value: usize) -> Option<i32> {
+    let mut map: Vec<bool> = Vec::with_capacity(expected_value);
+    map.resize(expected_value, false);
     for value in a {
         map[*value as usize] = true;
     }
@@ -67,7 +65,7 @@ pub fn p2_solve(a: &[i32]) -> Option<i32> {
 
     for a_value in &sorted {
         for b_value in &sorted {
-            diff = EXPECTED_VALUE - b_value - a_value;
+            diff = expected_value as i32 - b_value - a_value;
             if diff < 1 {
                 break;
             }

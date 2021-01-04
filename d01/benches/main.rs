@@ -10,9 +10,9 @@ fn main_benchmark(c: &mut Criterion) {
         });
         let parsed = parse(buffer.as_bytes());
         c.bench_function("d01 p1 (545379)", |b| {
-            b.iter(|| p1_solve(&parsed));
+            b.iter(|| p1_solve(&parsed, 2020));
         });
-        c.bench_function("d01 p2 (257778836)", |b| b.iter(|| p2_solve(&parsed)));
+        c.bench_function("d01 p2 (257778836)", |b| b.iter(|| p2_solve(&parsed, 2020)));
     }
 }
 
