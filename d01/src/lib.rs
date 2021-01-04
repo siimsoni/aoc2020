@@ -1,4 +1,5 @@
 use std::io::BufRead;
+use btoi::btoi;
 
 const EXPECTED_VALUE: i32 = 2020;
 
@@ -6,16 +7,26 @@ pub fn parse<R>(mut reader: R) -> Vec<i32>
 where
     R: BufRead,
 {
-    let mut buffer = String::new();
-    let mut result: Vec<i32> = Vec::new();
-    while let Ok(n) = reader.read_line(&mut buffer) {
-        if n == 0 {
+    let mut result = Vec::new();
+    let mut page = [0; 2048];
+    let mut item: [u8; 16] = [0; 16];
+    let mut item_len = 0;
+    while let Ok(page_len) = reader.read(&mut page) {
+        if page_len == 0 {
             break;
         }
-        if let Ok(number) = buffer.trim().parse() {
-            result.push(number);
+        for c in &page[..page_len] {
+            if c == &b'\n' {
+                result.push(btoi(&item[..item_len]).expect("valid integer"));
+                item_len = 0;
+            } else {
+                item[item_len] = *c;
+                item_len += 1;
+            }
         }
-        buffer.clear();
+    }
+    if item_len > 0 {
+        result.push(btoi(&item[..item_len]).expect("valid integer"));
     }
     result
 }
